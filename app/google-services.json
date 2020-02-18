@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "618721242424",
+    "firebase_url": "https://merataskmanager.firebaseio.com",
+    "project_id": "merataskmanager",
+    "storage_bucket": "merataskmanager.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:618721242424:android:ab18ce0fe77b3f6fd3e5cd",
+        "android_client_info": {
+          "package_name": "com.cmpundhir.cm.merataskmanager"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "618721242424-aostookj8g4l2qsb5k3c0jil676lv30m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.cmpundhir.cm.merataskmanager",
+            "certificate_hash": "92ee1811b9aee6122ee5271bce32e5ec101c4e7e"
+          }
+        },
+        {
+          "client_id": "618721242424-hk0if6p8dubgs4fk58d53955qqkgugh2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAQnia3sENsPC_zXwhv70gV85oWbBx9nWM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "618721242424-hk0if6p8dubgs4fk58d53955qqkgugh2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
