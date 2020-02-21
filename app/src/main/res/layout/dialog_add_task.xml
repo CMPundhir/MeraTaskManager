@@ -90,6 +90,7 @@
 
     <LinearLayout
         android:id="@+id/llDate"
+        android:visibility="gone"
         android:layout_margin="5dp"
         android:gravity="center"
         android:orientation="horizontal"
@@ -149,13 +150,26 @@
             android:layout_height="wrap_content"/>
     </RadioGroup>
 
-    <Button
-        android:id="@+id/doneBtn"
-        android:textColor="@color/white"
-        android:backgroundTint="@color/colorPrimaryDark"
+    <RelativeLayout
         android:layout_margin="20dp"
-        android:text="DONE "
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/doneBtn"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/button_nor"
+            android:text="DONE "
+            android:enabled="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:visibility="gone"
+            android:layout_centerInParent="true"
+            android:translationZ="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </RelativeLayout>
+
 
 </LinearLayout>

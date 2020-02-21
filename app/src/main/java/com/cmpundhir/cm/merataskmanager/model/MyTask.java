@@ -3,6 +3,7 @@ package com.cmpundhir.cm.merataskmanager.model;
 import com.cmpundhir.cm.merataskmanager.utils.TaskPriority;
 import com.cmpundhir.cm.merataskmanager.utils.TaskStatus;
 import com.cmpundhir.cm.merataskmanager.utils.TaskType;
+import com.google.firebase.firestore.ServerTimestamp;
 
 import java.util.Date;
 
@@ -10,7 +11,7 @@ public class MyTask {
     private String id;
     private String task;
     private String dsc;
-    private Date createDate;
+    private @ServerTimestamp Date createDate;
     private Date endDate;
     private TaskType taskType;
     private TaskPriority taskPriority;
