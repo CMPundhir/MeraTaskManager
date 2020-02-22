@@ -5,9 +5,9 @@
     <color name="colorAccent">#00C853</color>
 
     <color name="priorityHigh">#f00</color>
-    <color name="priorityMedium">#FF6D00</color>
-    <color name="priorityLow">#BE9C00</color>
-    <color name="priorityNone">#00B8D4</color>
+    <color name="priorityMedium">#FFD600</color>
+    <color name="priorityLow">#00C853</color>
+    <color name="priorityNone">#6200EA</color>
 
     <color name="green">#00C853</color>
     <color name="white">#FFFFFF</color>

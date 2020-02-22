@@ -23,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cmpundhir.cm.merataskmanager.adapters.MyTaskAdapter;
+import com.cmpundhir.cm.merataskmanager.listeners.TaskListener;
 import com.cmpundhir.cm.merataskmanager.model.MyTask;
 import com.cmpundhir.cm.merataskmanager.utils.FirePaths;
 import com.cmpundhir.cm.merataskmanager.utils.MyDialog;
@@ -38,7 +39,10 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.ParseException;
@@ -52,10 +56,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity {
+import javax.annotation.Nullable;
+
+public class MainActivity extends AppCompatActivity implements TaskListener {
 
 
-
+    private ProgressBar list_progressbar;
     private static final int RC_SIGN_IN = 111;
     private static final String TAG = "MainActivity__";
     FloatingActionButton fab;
@@ -69,7 +75,10 @@ public class MainActivity extends AppCompatActivity {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     MyTaskAdapter myTaskAdapter;
     RecyclerView recyclerView;
+
     private void init(){
+        list_progressbar = findViewById(R.id.list_progressbar);
+
         fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -102,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    @Override
+    @Override 
     protected void onResume() {
         super.onResume();
         updateUi();
@@ -212,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
         datePickerDialog.show();
     }
 
-    private void addTaskTOFire(MyTask task,final Button button,final ProgressBar progressBar,final Dialog dialog){
+    private void addTaskTOFire(final MyTask task, final Button button, final ProgressBar progressBar, final Dialog dialog){
         button.setEnabled(false);
         progressBar.setVisibility(View.VISIBLE);
 
@@ -222,12 +231,14 @@ public class MainActivity extends AppCompatActivity {
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
-                        Toast.makeText(MainActivity.this, "Task added successfully", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "Task added successfully : "+documentReference.getId(), Toast.LENGTH_SHORT).show();
                         Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
                         button.setEnabled(true);
                         progressBar.setVisibility(View.GONE);
                         dialog.dismiss();
-                        getTasks();
+                        task.setId(documentReference.getId());
+                        myTaskList.add(0,task);
+                        myTaskAdapter.notifyDataSetChanged();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -243,12 +254,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getTasks(){
-        db.collection(FirePaths.TASK).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+        db.collection(FirePaths.TASK)
+                .orderBy("createDate", Query.Direction.DESCENDING)
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 myTaskList.clear();
                 for(DocumentSnapshot documentSnapshot : queryDocumentSnapshots.getDocuments()){
-                    myTaskList.add(documentSnapshot.toObject(MyTask.class));
+                    MyTask task = documentSnapshot.toObject(MyTask.class);
+                    task.setId(documentSnapshot.getId());
+                    myTaskList.add(task);
                 }
                 myTaskAdapter.notifyDataSetChanged();
                 Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_SHORT).show();
@@ -256,9 +272,49 @@ public class MainActivity extends AppCompatActivity {
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(MainActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+                Log.d(TAG,"error : "+e.getMessage());
+                Toast.makeText(MainActivity.this, "Failed : "+e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
+    private void updateTasksList(){
+        db.collection(FirePaths.TASK).addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                for(DocumentSnapshot documentSnapshot : queryDocumentSnapshots.getDocuments()){
+                    myTaskList.add(documentSnapshot.toObject(MyTask.class));
+                }
+                myTaskAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+    private void updateTaskStatus(MyTask task){
+        list_progressbar.setVisibility(View.VISIBLE);
+        db.collection(FirePaths.TASK).document(task.getId())
+                .update("taskStatus",task.getTaskStatus().toString())
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_SHORT).show();
+                        list_progressbar.setVisibility(View.GONE);
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        list_progressbar.setVisibility(View.GONE);
+                        Toast.makeText(MainActivity.this, "Failure", Toast.LENGTH_SHORT).show();
+
+                    }
+                });
+
+    }
+
+    @Override
+    public void onTaskStatusUpdate(MyTask task) {
+        updateTaskStatus(task);
+    }
 }
